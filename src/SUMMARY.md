@@ -1,0 +1,8 @@
+# Summary
+
+[Wstęp](./introduction.md)
+
+# Struktura projektu
+- [Start](./chapter_1/start.md)
+- [Dane wrażliwe](./chapter_1/vulnerable_data.md)
+- [Git](./chapter_1/git.md)
