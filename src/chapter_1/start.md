@@ -69,3 +69,69 @@ drwxr-xr-x@   - rich 17 Apr 14:25 sites
 | compose.yaml | Plik yaml | Plik compose do orkiestracji serwisów |
 | Dockerfile | Plik | Plik konfiguracyjny domyślnego obrazu kontenera |
 
+
+## Automatyzacja
+
+Powyższe zadania mogą być zautomatyzowane poprzez wykorzystanie programu [Taskfile](https://taskfile.dev/). Po instalacji programu użytkownik powinien upewnić się czy program znajduję się w ścieżce zmiennej środowiskowej PATH!
+
+Katalog główny projektu zawiera plik `Taskfile.yml`, który to z kolei zawiera definicje zadań jakie mogą zostać wykonane. Przyjrzyjmy się jednemu z tych zadań:
+
+```yaml
+tasks:
+    default:
+       cmds:
+           - task: run:dev
+```
+
+Powyższe zadanie jest zadaniem głównym tzn. uruchamia się ono po wpisaniu komendy `task` składa się z innego zadania `run:dev`, rzućmy na nie okiem.
+
+### Uruchamianie aplikacji w trybie deweloperskim
+
+```yaml
+run:dev:
+  desc: Runs containers for development
+  aliases: [rd]
+  cmds:
+    - task: configure:hosts:dev:delete
+    - task: configure:hosts:dev:add
+    - docker compose up -d {{.CLI_ARGS}}
+```
+
+### Uruchamianie aplikacji w trybie deweloperskim
+
+definicja `run:dev` zawiera:
+- opis zadania: Uruchamianie kontenerów dla trybu deweloperskiego
+- 2 zadania configure:hosts:dev do usuwania hostów i ich dodawania
+- komende docker compose uruchamiającą kontenery w trybie `detached` czyli kontenery nie będą pracować w głównej sesji powłoki (prościej mówiąc nie ujrzymy domyślnie ich logów).
+
+### Zatrzymywanie  aplikacji w trybie deweloperskim
+
+```yaml
+stop:dev:
+    desc: Stops containers for development if they are already running
+    aliases: [sd]
+    vars:
+      CONTAINER: 'cursor-web-1'
+    preconditions:
+      - docker ps --filter "name={{.CONTAINER}}" | grep {{.CONTAINER}}
+    cmds:
+      - task: configure:hosts:dev:delete
+      - docker compose down
+```
+
+```bash
+# Zatrzymywanie kontenerów
+task stop:dev
+# Można także użyć skrótu (alias)
+task sd
+```
+
+### Przebudowywanie kontenerów
+
+Jeżeli do pliku `Dockerfile` naniesiono jakieś zmiany, należy dokonać przebudowy obrazu. Aby uruchomić aplikację wraz z przebudową obrazu użyj poniższej komendy:
+
+```bash
+# Forwardowanie flag do komendy '{{.CLI_ARGS}}'
+task rd -- --build
+```
+
