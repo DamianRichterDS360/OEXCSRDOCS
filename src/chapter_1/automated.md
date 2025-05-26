@@ -4,12 +4,54 @@
 
 Powyższe zadania mogą być zautomatyzowane poprzez wykorzystanie programu [Taskfile](https://taskfile.dev/).
 
+### Instalacja
+
+#### Instalacja Mac OS X
+
+```bash
+brew install go-task
+```
+
+#### Instalacja Windows
+
+```bash
+winget install Task.Task
+```
+
+#### Instalacja Linux/WSL
+
+```bash
+sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+```
+
+## Sprawdzenie poprawności instalacji
+
 Po instalacji programu użytkownik powinien upewnić się czy program został aby na pewno poprawnie zainstalowany. Przykładowo uruchomienie terminala i wpisanie komendy `task --version` powinno pokazać obecną wersję programu:
 
 ```bash
 ❯ task --version
 3.43.3
 ```
+
+Jeżeli program nie został odnaleziony tj. wystąpiła sytuacja poniżej:
+
+```bash
+<nazwa_powloki>: command not found: task
+```
+
+Oznacza to, że powłoka nie jest w stanie znaleźć programu task i należy dodać go do zmiennej środowiskowej PATH.
+
+```task
+export PATH="./local/bin/:$PATH" >> <plik_konfiguracyjny_powloki>
+```
+
+Gdzie plikiem konfiguracyjnym powłoki może być:
+- ~/.zshrc
+- ~/.bashrc
+
+Wprowadzenie zmian umożliwi komenda
+
+## Struktura pliku Taskfile.yml
 
 Katalog główny projektu zawiera plik `Taskfile.yml`, który to z kolei zawiera definicje zadań jakie mogą zostać wykonane. Przyjrzyjmy się jednemu z tych zadań:
 
@@ -83,9 +125,15 @@ HOSTS: [
 
 Poprzez wpisanie jednego z adresów np. http://rozliczeniabat.local
 
-### Uruchamianie aplikacji w trybie deweloperskim
+## Uruchamianie aplikacji w trybie deweloperskim
+
+definicja `run:dev` zawiera:
+- opis zadania: Uruchamianie kontenerów dla trybu deweloperskiego
+- 2 zadania configure:hosts:dev do usuwania hostów i ich dodawania
+- komende docker compose uruchamiającą kontenery w trybie `detached` czyli kontenery nie będą pracować w głównej sesji powłoki (prościej mówiąc nie ujrzymy domyślnie ich logów).
 
 ```yaml
+# Definicja uruchamiania aplikacji w trybie deweloperskim
 run:dev:
   desc: Runs containers for development
   aliases: [rd]
@@ -95,14 +143,20 @@ run:dev:
     - docker compose up -d {{.CLI_ARGS}}
 ```
 
-### Uruchamianie aplikacji w trybie deweloperskim
+Trzy komendy uruchamiające aplikację w trybie deweloperskim:
 
-definicja `run:dev` zawiera:
-- opis zadania: Uruchamianie kontenerów dla trybu deweloperskiego
-- 2 zadania configure:hosts:dev do usuwania hostów i ich dodawania
-- komende docker compose uruchamiającą kontenery w trybie `detached` czyli kontenery nie będą pracować w głównej sesji powłoki (prościej mówiąc nie ujrzymy domyślnie ich logów).
+```bash
+task
+task run:dev
+task rd
+```
 
-### Zatrzymywanie  aplikacji w trybie deweloperskim
+## Zatrzymywanie  aplikacji w trybie deweloperskim
+
+definicja `stop:dev` zawiera:
+- opis zadania: Zatrzymywanie kontenerów pracujących w trybie deweloperskim
+- zadanie configure:hosts:dev:delete do usuwania hostów
+- komende docker compose down zatrzymującą kontenery
 
 ```yaml
 stop:dev:
@@ -124,12 +178,14 @@ task stop:dev
 task sd
 ```
 
-### Przebudowywanie kontenerów
+## Przebudowywanie kontenerów
 
 Jeżeli do pliku `Dockerfile` naniesiono jakieś zmiany, należy dokonać przebudowy obrazu. Aby uruchomić aplikację wraz z przebudową obrazu użyj poniższej komendy:
 
 ```bash
 # Forwardowanie flag do komendy '{{.CLI_ARGS}}'
 task rd -- --build
+# albo
+task run:dev -- --build
 ```
 
