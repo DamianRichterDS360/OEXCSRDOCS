@@ -80,3 +80,24 @@ Następnie w szablonie pod hiperłącze podstawiana jest ta zmienna (gwarantuje 
 ```html
 <a href="<tmpl_var wysylki_url>">
 ```
+
+### Wyświetlenie wszystkich zmiennych środowiskowych
+
+```bash
+task print_all_env_vars:dev
+# lub
+task penvd
+```
+
+<div class="warning">
+
+Powyższe zadanie wymaga zainstalowanej aplikacji jq w celu parsowania konfiguracji dockera.
+
+**Mac OS X**:      brew install jq         <br />
+**Debian/Ubuntu**: sudo apt-get install jq <br />
+**Fedora**:        sudo dnf install jq     <br />
+**Arch**:          sudo pacman -S jq       <br />
+
+
+</div>
+
