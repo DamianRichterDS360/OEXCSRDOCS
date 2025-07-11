@@ -151,9 +151,13 @@ source ~/.bashrc
 
 ## Dodanie zmiennych środowiskowych
 
-Plik env.zip ze zmiennymi środowiskowymi należy rozpakować w głównym folderze projektu
+W celu wygenerowania lokalnie odszyfrowanych zmiennych środowiskowych należy użyć komendy poniższej z poziomu głównego folderu projektu (Cursor), po czym wpisać hasło do Ansible Vault przekazane przez DS360.
 
-<!-- TODO: opisać korzystanie z playbooków ansible -->
+```bash
+ansible-playbook generate_env.yml --ask-vault-pass
+```
+
+Po wykonaniu się task-ów w playbook-u, pliki ze zmiennymi środowiskowymi powinny znajdować się w .env_files/development
 
 ## Uruchomienie aplikacji
 
